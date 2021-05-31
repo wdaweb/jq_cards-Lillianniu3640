@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100%;
+            background-color: rgb(234, 217, 207);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .circle {
+            transform: translate(44%, 20%);
+        }
+
+        .square {
+            transform: translate(49%, -80%);
+        }
+
+        .triangle {
+            transform: translate(53%, -150%);
+        }
+
+        .logotext {
+            transform: translateY(-80%);
+        }
+
+        #glasses{
+            transform: translate(46%,-110%);
+            cursor: pointer;
+        }
+
+        .p1{
+            position: absolute;
+            transform: translate(-100%,120%);
+        }
+
+        .p2{
+            position: absolute;
+            transform: translate(0%,120%);
+        }
+
+        #game {
+           
+            width: 1200px;
+            height: 850px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-42%, 10%);
+
+        }
+
+        .card {
+            width: 180px;
+            height: 180px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform .5s;
+            margin: 10px;
+            display: inline-block;
+            cursor: pointer;
+            border-radius: 6%;
+            box-shadow: 5px 5px 10px rgb(226, 209, 197);
+        }
+
+        .card:hover {
+            transform: scale(0.9);
+        }
+
+
+        .card-back {
+            width: 100%;
+            height: 100%;
+             background-image: url(./images/card_back.png);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            position: absolute;
+            backface-visibility: hidden;
+            -web-backface-visibility: hidden;
+        }
+
+        .card-front {
+            width: 100%;
+            height: 100%;
+            background-image: url(./images/1A.png);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            position: absolute;
+            transform: rotateY(180deg);
+        }
+
+        .card-open {
+            transform: rotateY(180deg);
+        }
+
+        .card-glasses {
+            animation: rotatecard 2s;
+        }
+        
+        @keyframes rotatecard{
+            from{
+                transform: rotateY(180deg);
+            }
+            to{
+                transform: rotateY(-180deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="logo">
+        <p class="circle"><img src="./images/circle.png" width="3%"
+                class="animate__animated animate__jello animate__infinite"></p>
+        <p class="square"><img src="./images/square.png" width="2.5%"
+                class="animate__animated animate__shakeY animate__slower 10s animate__infinite"></p>
+        <p class="triangle"><img src="./images/triangle.png" width="3%"
+                class="animate__animated animate__heartBeat animate__slowe 2s animate__infinite"></p>
+        <p class="logotext" align="center"><img src="./images/logo.png"></p>
+    </div>
+    <div id="glasses"><span class="p1">使用透視眼鏡</span><img alt="透視眼鏡" title="透視眼鏡" src="./images/glasses-35.png" width="10%"><span class="p2">只有一次機會</span></div>
+    <div id="game"></div>
+
+    <script src="./jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+
+         const audio = new Audio()
+         audio.src = './game_bgmusic.mp3'
+
+        for (let i = 0; i < 20; i++) {
+            $('#game').append(`
+             <div class="card"> 
+              <div class="card-back"></div>
+              <div class="card-front"></div>
+             </div>
+              `)
+            }
+
+        for (let i = 0; i < 20; i++) {
+            let number = i % (20 / 2) + 1
+            $('.card').eq(i).find('.card-front').css('background-image', `url(./images/${number}F.png)`)
+            $('.card').eq(i).attr('data-card', number)
+
+            let target = Math.floor(Math.random() * 20)
+            $('.card').eq(target).insertAfter($('.card').eq(i))
+        }
+
+        $('#glasses').click(function () {
+            $('.card').addClass('card-glasses')
+            
+        })
+   
+        $('#game').on('click', '.card', function () {
+            audio.play()
+            if ($('.card-open').length < 2 && !$(this).hasClass('card-open')) {
+                $(this).addClass('card-open')
+            }
+
+            if ($('.card-open').length === 2) {
+                if ($('.card-open').eq(0).attr('data-card') === $('.card-open').eq(1).attr('data-card')) {
+                    $('.card-open').fadeTo(1500, 0).addClass('card-clear')
+                }
+               
+                setTimeout(() => {
+                    $('.card-open').removeClass('card-open')
+                }, 1000);
+            }
+            
+            if ($('.card-clear').length === 20) {
+                Swal.fire({
+                    title: '恭喜過關ovo'
+                })
+            }
+        })
+
+    </script>
+</body>
+
+</html>
